@@ -1,0 +1,54 @@
+diff -rupN Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/camera_common.c Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/camera_common.c
+--- Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/camera_common.c	2020-06-26 07:15:15.000000000 +0300
++++ Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/camera_common.c	2020-09-21 13:24:45.143249072 +0300
+@@ -130,6 +130,12 @@ static const struct camera_common_colorf
+ 		V4L2_COLORSPACE_SRGB,
+ 		V4L2_PIX_FMT_XRGGB10P,
+ 	},
++		/* Add grayscale support */
++	{
++		MEDIA_BUS_FMT_Y10_1X10,
++		V4L2_COLORSPACE_RAW,
++		V4L2_PIX_FMT_Y10,
++	},
+ };
+ 
+ struct camera_common_csi_io_pad_ctx {
+@@ -662,6 +668,12 @@ verify_code:
+ 	mf->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
+ 	mf->quantization = V4L2_QUANTIZATION_DEFAULT;
+ 
++	if (mf->code == MEDIA_BUS_FMT_Y10_1X10)
++	{
++		mf->xfer_func = V4L2_XFER_FUNC_NONE;
++		mf->colorspace = V4L2_COLORSPACE_RAW;
++	}
++
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(camera_common_try_fmt);
+diff -rupN Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/sensor_common.c Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/sensor_common.c
+--- Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/sensor_common.c	2020-06-26 07:15:15.000000000 +0300
++++ Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/sensor_common.c	2020-09-21 13:24:45.143249072 +0300
+@@ -225,6 +225,8 @@ static int extract_pixel_format(
+ 		*format = V4L2_PIX_FMT_UYVY;
+ 	else if (strncmp(pixel_t, "yuv_vyuy16", size) == 0)
+ 		*format = V4L2_PIX_FMT_VYUY;
++	else if (strncmp(pixel_t, "gray_y10", size) == 0)
++		*format = V4L2_PIX_FMT_Y10;
+ 	else {
+ 		pr_err("%s: Need to extend format%s\n", __func__, pixel_t);
+ 		return -EINVAL;
+diff -rupN Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/vi/vi2_formats.h Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/vi/vi2_formats.h
+--- Linux_for_Tegra_origin/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/vi/vi2_formats.h	2020-06-26 07:15:15.000000000 +0300
++++ Linux_for_Tegra/source/public/kernel/nvidia/drivers/media/platform/tegra/camera/vi/vi2_formats.h	2020-09-21 13:24:45.143249072 +0300
+@@ -92,6 +92,9 @@ static const struct tegra_video_format v
+ 	TEGRA_VIDEO_FORMAT(RAW10, 10, SBGGR10_1X10, 2, 1, T_R16_I,
+ 				RAW10, SBGGR10, "BGBG.. GRGR.."),
+ 
++	TEGRA_VIDEO_FORMAT(RAW10, 10, Y10_1X10, 2, 1, T_R16_I,
++				RAW10, Y10, "GRAY10"),
++
+ 	/* RAW 10 Packed format */
+ 	TEGRA_VIDEO_FORMAT(RAW10, 10, XBGGR10P_3X10, 4, 3, T_X2Lc10Lb10La10,
+ 				RAW10, XBGGR10P, "BGBG.. GRGR.."),

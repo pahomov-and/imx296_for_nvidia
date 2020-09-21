@@ -1,0 +1,718 @@
+diff -rupN Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-platforms/tegra210-porg-camera-dual-imx296.dtsi Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-platforms/tegra210-porg-camera-dual-imx296.dtsi
+--- Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-platforms/tegra210-porg-camera-dual-imx296.dtsi	1970-01-01 03:00:00.000000000 +0300
++++ Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-platforms/tegra210-porg-camera-dual-imx296.dtsi	2020-09-21 13:22:22.510828671 +0300
+@@ -0,0 +1,304 @@
++#include <dt-bindings/media/camera.h>
++#include <dt-bindings/platform/t210/t210.h>
++
++/ {
++	host1x {
++		vi_base: vi {
++			num-channels = <2>;
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				vi_port0: port@0 {
++					reg = <0>;
++					status = "okay";
++					rbpcv2_imx296_vi_in0: endpoint {
++						port-index = <0>;
++						bus-width = <1>;
++						remote-endpoint = <&rbpcv2_imx296_csi_out0>;
++					};
++				};
++				vi_port1: port@1 {
++					reg = <1>;
++					status = "okay";
++					rbpcv2_imx296_vi_in1: endpoint {
++						port-index = <4>;
++						bus-width = <1>;
++						remote-endpoint = <&rbpcv2_imx296_csi_out1>;
++					};
++				};
++			};
++		};
++
++		csi_base: nvcsi {
++			num-channels = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			csi_chan0: channel@0 {
++				reg = <0>;
++				status = "okay";
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					csi_chan0_port0: port@0 {
++						reg = <0>;
++						status = "okay";
++						rbpcv2_imx296_csi_in0: endpoint@0 {
++							port-index = <0>;
++							bus-width = <1>;
++							remote-endpoint = <&rbpcv2_imx296_dual_out0>;
++						};
++					};
++					csi_chan0_port1: port@1 {
++						reg = <1>;
++						status = "okay";
++						rbpcv2_imx296_csi_out0: endpoint@1 {
++							remote-endpoint = <&rbpcv2_imx296_vi_in0>;
++						};
++					};
++				};
++			};
++			csi_chan1: channel@1 {
++				reg = <1>;
++				status = "okay";
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					csi_chan1_port0: port@2 {
++						reg = <0>;
++						status = "okay";
++						rbpcv2_imx296_csi_in1: endpoint@2 {
++							port-index = <4>;
++							bus-width = <1>;
++							remote-endpoint = <&rbpcv2_imx296_out1>;
++						};
++					};
++					csi_chan1_port1: port@3 {
++						reg = <1>;
++						status = "okay";
++						rbpcv2_imx296_csi_out1: endpoint@3 {
++							remote-endpoint = <&rbpcv2_imx296_vi_in1>;
++						};
++					};
++				};
++			};
++		};
++	};
++
++	cam_i2cmux {
++		status = "okay";
++		i2c_0: i2c@0 {
++			status = "okay";
++			imx296_cam0: rbpcv2_imx296_a@1a {
++				compatible = "nvidia,imx296";
++				/* I2C device address */
++				reg = <0x1a>;
++				status = "okay";
++
++				/* V4L2 device node location */
++				devnode = "video0";
++
++				/* Physical dimensions of sensor */
++				physical_w = "30.680";
++				physical_h = "20.760";
++
++				sensor_model = "imx296";
++
++				use_sensor_mode_id = "true";
++
++				mode0 { /* IMX296_MODE_1440x1088_60FPS */
++					mclk_khz = "54000";
++					num_lanes = "1";
++					tegra_sinterface = "serial_a";
++					phy_mode = "DPHY";
++					discontinuous_clk = "no";
++					dpcm_enable = "true";
++					cil_settletime =  "0";
++
++					csi_pixel_bit_depth = "8";
++
++					active_w = "1440";
++					active_h = "1088";
++					pixel_t = "gray_y10";
++					readout_orientation = "0";
++					line_length = "1440";
++					inherent_gain = "10";
++					mclk_multiplier = "9.33";
++					pix_clk_hz = "118800000";
++
++					serdes_pix_clk_hz = "118800000";
++
++					gain_factor = "16";
++					framerate_factor = "1000000";
++					exposure_factor = "1000000";
++					min_gain_val = "1"; /* 1.00x */
++					max_gain_val = "480"; /* 10.66x */
++					step_gain_val = "1";
++					default_gain = "200"; /* 1.00x */
++					min_hdr_ratio = "3";
++					max_hdr_ratio = "3";
++					min_framerate = "60000000"; /* 60.0 fps */
++					max_framerate = "60000000"; /* 60.0 fps */
++					step_framerate = "1";
++					default_framerate = "60000000"; /* 60.0 fps */
++					min_exp_time = "29";
++					max_exp_time = "15534389";
++					step_exp_time = "1";
++					default_exp_time = "5000";
++
++					embedded_metadata_height = "0";
++				};
++
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					port@0 {
++						reg = <0>;
++						rbpcv2_imx296_dual_out0: endpoint {
++							status = "okay";
++							port-index = <0>;
++							bus-width = <1>;
++							remote-endpoint = <&rbpcv2_imx296_csi_in0>;
++						};
++					};
++				};
++			};
++		};
++		i2c_1: i2c@1 {
++			imx296_cam1: rbpcv2_imx296_e@1a {
++				compatible = "nvidia,imx296";
++				/* I2C device address */
++				reg = <0x1a>;
++				status = "okay";
++
++				/* V4L2 device node location */
++				devnode = "video1";
++
++				/* Physical dimensions of sensor */
++				physical_w = "3.680";
++				physical_h = "2.760";
++
++				sensor_model = "imx296";
++
++				use_sensor_mode_id = "true";
++
++				mode0 { /* IMX296_MODE_1440x1088_60FPS */
++					mclk_khz = "54000";
++					num_lanes = "1";
++					tegra_sinterface = "serial_e";
++					phy_mode = "DPHY"; //"CPHY"; //"DPHY";
++					discontinuous_clk = "no"; //"yes";
++					dpcm_enable = "true"; //"false";
++					cil_settletime =  "0";
++
++					active_w = "1440";
++					active_h = "1088";
++					pixel_t = "gray_y10";
++					readout_orientation = "90";
++					line_length = "1440";
++					inherent_gain = "1";
++					mclk_multiplier = "9.33";
++					pix_clk_hz = "118800000";
++
++					gain_factor = "16";
++					framerate_factor = "1000000";
++					exposure_factor = "1000000";
++					min_gain_val = "1"; /* 1.00x */
++					max_gain_val = "480"; /* 10.66x */
++					step_gain_val = "1";
++					default_gain = "16"; /* 1.00x */
++					min_hdr_ratio = "1";
++					max_hdr_ratio = "1";
++					min_framerate = "60000000"; /* 60.0 fps */
++					max_framerate = "60000000"; /* 60.0 fps */
++					step_framerate = "1";
++					default_framerate = "60000000"; /* 60.0 fps */
++					min_exp_time = "29";
++					max_exp_time = "15534389";
++					step_exp_time = "1";
++					default_exp_time = "5000";
++
++					embedded_metadata_height = "0";
++				};
++
++
++				ports {
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					port@0 {
++						reg = <0>;
++						status = "okay";
++						rbpcv2_imx296_out1: endpoint {
++							status = "okay";
++							port-index = <4>;
++							bus-width = <1>;
++							remote-endpoint = <&rbpcv2_imx296_csi_in1>;
++						};
++					};
++				};
++			};
++		};
++	};
++
++	lens_imx296@RBPCV2 {
++		min_focus_distance = "0.0";
++		hyper_focal = "0.0";
++		focal_length = "3.04";
++		f_number = "2.0";
++		aperture = "0.0";
++	};
++};
++
++/ {
++	tcp: tegra-camera-platform {
++		compatible = "nvidia, tegra-camera-platform";
++
++		num_csi_lanes = <1>;
++		max_lane_speed = <1500000>;
++		min_bits_per_pixel = <10>;
++		vi_peak_byte_per_pixel = <2>;
++		vi_bw_margin_pct =  <25>;
++		max_pixel_rate = <1188000>;
++		isp_peak_byte_per_pixel = <5>;
++		isp_bw_margin_pct = <25>;
++
++		modules {
++			cam_module0: module0 {
++				status = "okay";
++				badge = "porg_front_RBPCV2";
++				position = "front";
++				orientation = "1";
++				cam_module0_drivernode0: drivernode0 {
++					status = "okay";
++					pcl_id = "v4l2_sensor";
++					devname = "imx296 7-001a";
++					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@0/rbpcv2_imx296_a@1a";
++				};
++				cam_module0_drivernode1: drivernode1 {
++					status = "okay";
++					pcl_id = "v4l2_lens";
++					proc-device-tree = "/proc/device-tree/lens_imx296@RBPCV2/";
++				};
++			};
++			cam_module1: module1 {
++				status = "okay";
++				badge = "porg_rear_RBPCV2";
++				position = "rear";
++				orientation = "1";
++				cam_module1_drivernode0: drivernode0 {
++					status = "okay";
++					pcl_id = "v4l2_sensor";
++					devname = "imx296 8-001a";
++					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/rbpcv2_imx296_e@1a";
++				};
++				cam_module1_drivernode1: drivernode1 {
++					status = "okay";
++					pcl_id = "v4l2_lens";
++					proc-device-tree = "/proc/device-tree/lens_imx296@RBPCV2/";
++				};
++			};
++		};
++	};
++};
+diff -rupN Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-plugin-manager/tegra210-porg-plugin-manager.dtsi Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-plugin-manager/tegra210-porg-plugin-manager.dtsi
+--- Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-plugin-manager/tegra210-porg-plugin-manager.dtsi	2020-06-26 07:14:10.000000000 +0300
++++ Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/porg-plugin-manager/tegra210-porg-plugin-manager.dtsi	2020-09-21 13:22:22.510828671 +0300
+@@ -170,387 +170,7 @@
+                         };
+                 };
+ 
+-		fragement@9 {
+-			ids = "<3448-0000-300", "<3448-0002-300";
+-			override@0 {
+-				target = <&max77620_ldo6>;
+-				_overlay_ {
+-                                        status = "disabled";
+-				};
+-			};
+-			override@1 {
+-				target = <&sdhci2>;
+-				_overlay_ {
+-					keep-power-in-suspend;
+-					non-removable;
+-				};
+-			};
+-			/* IMX219 single sensor module */
+-			override@2 {
+-				target = <&imx219_single_cam0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@3 {
+-				target = <&cam_module0>;
+-				_overlay_ {
+-					status = "okay";
+-					badge = "porg_front_RBPCV2";
+-					position = "front";
+-					orientation = "1";
+-				};
+-			};
+-			override@4 {
+-				target = <&cam_module0_drivernode0>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_sensor";
+-					devname = "imx219 6-0010";
+-					proc-device-tree = "/proc/device-tree/host1x/i2c@546c0000/rbpcv2_imx219_a@10";
+-				};
+-			};
+-			override@5 {
+-				target = <&cam_module0_drivernode1>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_lens";
+-					proc-device-tree = "/proc/device-tree/lens_imx219@RBPCV2/";
+-				};
+-			};
+-			/* Enable VI ports */
+-			override@6 {
+-				target = <&vi_base>;
+-				_overlay_ {
+-					num-channels=<1>;
+-				};
+-			};
+-			override@7 {
+-				target = <&vi_port0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@8 {
+-				target = <&rbpcv2_imx219_vi_in0>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <0>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_csi_out0>;
+-				};
+-			};
+-			/* Enable CSI ports */
+-			override@9 {
+-				target = <&csi_base>;
+-				_overlay_ {
+-					num-channels=<1>;
+-				};
+-			};
+-			override@10 {
+-				target = <&csi_chan0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@11 {
+-				target = <&csi_chan0_port0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@12 {
+-				target = <&rbpcv2_imx219_csi_in0>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <0>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_out0>;
+-				};
+-			};
+-			override@13 {
+-				target = <&csi_chan0_port1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@14 {
+-				target = <&rbpcv2_imx219_csi_out0>;
+-				_overlay_ {
+-					status = "okay";
+-					remote-endpoint = <&rbpcv2_imx219_vi_in0>;
+-				};
+-			};
+-			/* tegra-camera-platform settings */
+-			override@15 {
+-				target = <&tcp>;
+-				_overlay_ {
+-					num_csi_lanes = <2>;
+-					max_lane_speed = <1500000>;
+-					min_bits_per_pixel = <10>;
+-					vi_peak_byte_per_pixel = <2>;
+-					vi_bw_margin_pct = <25>;
+-					max_pixel_rate = <240000>;
+-					isp_peak_byte_per_pixel = <5>;
+-					isp_bw_margin_pct = <25>;
+-				};
+-			};
+-			override@16 {
+-				target = <&cam_module1>;
+-				_overlay_ {
+-					status = "disabled";
+-				};
+-			};
+-		};
+ 
+-		fragement@10 {
+-			ids = ">=3448-0000-300", ">=3448-0002-300";
+-			override@0 {
+-				target = <&{/pcie@1003000/pci@2,0}>;
+-				_overlay_ {
+-					nvidia,plat-gpios = <&gpio TEGRA_GPIO(CC, 7) GPIO_ACTIVE_HIGH>;
+-				};
+-			};
+-			override@1 {
+-				target = <&sdhci2>;
+-				_overlay_ {
+-					vqmmc-supply = <&max77620_ldo6>;
+-					no-sdio;
+-					no-mmc;
+-					sd-uhs-sdr104;
+-					sd-uhs-sdr50;
+-					sd-uhs-sdr25;
+-					sd-uhs-sdr12;
+-				};
+-			};
+-			override@2 {
+-				target = <&throttle_oc1>;
+-				_overlay_ {
+-					nvidia,priority = <50>;
+-					nvidia,polarity-active-low = <1>;
+-					nvidia,count-threshold = <1>;
+-					nvidia,alarm-filter = <5100000>;
+-					nvidia,alarm-period = <0>;
+-					nvidia,cpu-throt-percent = <75>;
+-					nvidia,gpu-throt-level =
+-						<TEGRA_SOCTHERM_THROT_LEVEL_HIGH>;
+-				};
+-			};
+-			override@3 {
+-				target = <&{/leds}>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			/* IMX219 dual sensor module */
+-			override@4 {
+-				target = <&imx219_cam0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@5 {
+-				target = <&cam_module0>;
+-				_overlay_ {
+-					status = "okay";
+-					badge = "porg_front_RBPCV2";
+-					position = "front";
+-					orientation = "1";
+-				};
+-			};
+-			override@6 {
+-				target = <&cam_module0_drivernode0>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_sensor";
+-					devname = "imx219 7-0010";
+-					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@0/rbpcv2_imx219_a@10";
+-				};
+-			};
+-			override@7 {
+-				target = <&cam_module0_drivernode1>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_lens";
+-					proc-device-tree = "/proc/device-tree/lens_imx219@RBPCV2/";
+-				};
+-			};
+-			override@8 {
+-				target = <&imx219_cam1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@9 {
+-				target = <&cam_module1>;
+-				_overlay_ {
+-					status = "okay";
+-					badge = "porg_rear_RBPCV2";
+-					position = "rear";
+-					orientation = "1";
+-				};
+-			};
+-			override@10 {
+-				target = <&cam_module1_drivernode0>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_sensor";
+-					devname = "imx219 8-0010";
+-					proc-device-tree = "/proc/device-tree/cam_i2cmux/i2c@1/rbpcv2_imx219_e@10";
+-				};
+-			};
+-			override@11 {
+-				target = <&cam_module1_drivernode1>;
+-				_overlay_ {
+-					status = "okay";
+-					pcl_id = "v4l2_lens";
+-					proc-device-tree = "/proc/device-tree/lens_imx219@RBPCV2/";
+-				};
+-			};
+-			/* Enable VI ports */
+-			override@12 {
+-				target = <&vi_base>;
+-				_overlay_ {
+-					num-channels=<2>;
+-				};
+-			};
+-			override@13 {
+-				target = <&vi_port0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@14 {
+-				target = <&vi_port1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@15 {
+-				target = <&rbpcv2_imx219_vi_in0>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <0>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_csi_out0>;
+-				};
+-			};
+-			override@16 {
+-				target = <&rbpcv2_imx219_vi_in1>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <4>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_csi_out1>;
+-				};
+-			};
+-			/* Enable CSI ports */
+-			override@17 {
+-				target = <&csi_base>;
+-				_overlay_ {
+-					num-channels = <2>;
+-				};
+-			};
+-			override@18 {
+-				target = <&csi_chan0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@19 {
+-				target = <&csi_chan0_port0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@20 {
+-				target = <&rbpcv2_imx219_csi_in0>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <0>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_dual_out0>;
+-				};
+-			};
+-			override@21 {
+-				target = <&csi_chan0_port1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@22 {
+-				target = <&rbpcv2_imx219_csi_out0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@23 {
+-				target = <&csi_chan1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@24 {
+-				target = <&csi_chan1_port0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@25 {
+-				target = <&rbpcv2_imx219_csi_in1>;
+-				_overlay_ {
+-					status = "okay";
+-					port-index = <4>;
+-					bus-width = <2>;
+-					remote-endpoint = <&rbpcv2_imx219_out1>;
+-				};
+-			};
+-			override@26 {
+-				target = <&csi_chan1_port1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@27 {
+-				target = <&rbpcv2_imx219_csi_out1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			/* tegra-camera-platform settings */
+-			override@28 {
+-				target = <&tcp>;
+-				_overlay_ {
+-					num_csi_lanes = <4>;
+-					max_lane_speed = <1500000>;
+-					min_bits_per_pixel = <10>;
+-					vi_peak_byte_per_pixel = <2>;
+-					vi_bw_margin_pct = <25>;
+-					max_pixel_rate = <240000>;
+-					isp_peak_byte_per_pixel = <5>;
+-					isp_bw_margin_pct = <25>;
+-				};
+-			};
+-			/* gpio based i2c mux */
+-			override@29 {
+-				target = <&{/cam_i2cmux}>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@30 {
+-				target = <&i2c_0>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-			override@31 {
+-				target = <&i2c_1>;
+-				_overlay_ {
+-					status = "okay";
+-				};
+-			};
+-		};
+ 
+ 		fragement@11 {
+ 			ids = ">=3448-0000-300", ">=3448-0002-300";
+@@ -561,5 +181,7 @@
+ 				};
+ 			};
+ 		};
++
++
+ 	};
+ };
+diff -rupN Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
+--- Linux_for_Tegra_origin/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi	2020-06-26 07:14:10.000000000 +0300
++++ Linux_for_Tegra/source/public/hardware/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi	2020-09-21 13:22:22.510828671 +0300
+@@ -30,6 +30,7 @@
+ #include "porg-platforms/tegra210-porg-camera.dtsi"
+ #include "porg-platforms/tegra210-porg-camera-rbpcv2-imx219.dtsi"
+ #include "porg-platforms/tegra210-porg-camera-rbpcv2-dual-imx219.dtsi"
++#include "porg-platforms/tegra210-porg-camera-dual-imx296.dtsi"
+ #include <t210-common-platforms/tegra210-ers-hdmi-e2190-1100-a00.dtsi>
+ #include <t210-common-platforms/tegra210-dp.dtsi>
+ #include "porg-platforms/tegra210-porg-thermal.dtsi"
